@@ -1,0 +1,83 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── helpers ────────────────────────────────────────────────────────────────
+
+    // Is the request from a signed-in user?
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Is the signed-in user the owner of this document?
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    // Does the incoming write set userId to the caller's own uid?
+    // Prevents a user from writing documents on behalf of someone else.
+    function writingAsself() {
+      return request.resource.data.userId == request.auth.uid;
+    }
+
+    // ── /users/{userId} ────────────────────────────────────────────────────────
+    // Each user can only read and write their own document.
+    // No user can read another user's data.
+    match /users/{userId} {
+      allow read:   if isOwner(userId);
+      allow create: if isOwner(userId)
+                    && request.resource.data.uid == userId;
+      allow update: if isOwner(userId)
+                    // uid and createdAt are immutable after creation
+                    && request.resource.data.uid == resource.data.uid
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if false; // users are never deleted client-side
+    }
+
+    // ── /posts/{postId} ────────────────────────────────────────────────────────
+    // Users can only see and modify their own posts.
+    match /posts/{postId} {
+      allow read:   if isAuth() && resource.data.userId == request.auth.uid;
+      allow create: if isAuth() && writingAsself()
+                    // Enforce required fields on create
+                    && request.resource.data.keys().hasAll([
+                         'userId', 'platform', 'title', 'caption',
+                         'hashtags', 'scheduledAt', 'status'
+                       ])
+                    // Only allow valid platform values
+                    && request.resource.data.platform in ['instagram', 'tiktok', 'youtube']
+                    // Only allow valid status values
+                    && request.resource.data.status in ['draft', 'scheduled'];
+
+      allow update: if isAuth() && resource.data.userId == request.auth.uid
+                    // userId cannot be changed after creation
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.platform in ['instagram', 'tiktok', 'youtube']
+                    && request.resource.data.status in ['draft', 'scheduled', 'reminded'];
+
+      allow delete: if isAuth() && resource.data.userId == request.auth.uid;
+    }
+
+    // ── /tasks/{taskId} ────────────────────────────────────────────────────────
+    // Users can only read and update their own tasks.
+    // Tasks are created server-side (Cloud Functions) or by the user.
+    match /tasks/{taskId} {
+      allow read:   if isAuth() && resource.data.userId == request.auth.uid;
+      allow create: if isAuth() && writingAsself()
+                    && request.resource.data.keys().hasAll(['userId', 'date', 'message', 'completed']);
+      allow update: if isAuth() && resource.data.userId == request.auth.uid
+                    // Only the completed field can be toggled by the client
+                    && request.resource.data.userId    == resource.data.userId
+                    && request.resource.data.date      == resource.data.date
+                    && request.resource.data.message   == resource.data.message;
+      allow delete: if false;
+    }
+
+    // ── catch-all ──────────────────────────────────────────────────────────────
+    // Deny everything not explicitly allowed above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
