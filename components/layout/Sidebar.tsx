@@ -6,19 +6,40 @@ import type { User } from 'firebase/auth'
 import { signOut } from '@/lib/auth'
 import { useEffect, useState } from 'react'
 
+// SVG icons as React components — replaces dangerouslySetInnerHTML (XSS fix)
+function IconDashboard() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+    </svg>
+  )
+}
+
+function IconCreate() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 8v8M8 12h8"/>
+    </svg>
+  )
+}
+
+function IconSchedule() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <path d="M16 2v4M8 2v4M3 10h18"/>
+    </svg>
+  )
+}
+
 const NAV = [
-  {
-    href: '/', label: 'Dashboard',
-    icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`
-  },
-  {
-    href: '/create', label: 'Create',
-    icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>`
-  },
-  {
-    href: '/schedule', label: 'Schedule',
-    icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`
-  },
+  { href: '/',         label: 'Dashboard', Icon: IconDashboard },
+  { href: '/create',   label: 'Create',    Icon: IconCreate    },
+  { href: '/schedule', label: 'Schedule',  Icon: IconSchedule  },
 ]
 
 export default function Sidebar({ user }: { user: User }) {
@@ -73,7 +94,8 @@ export default function Sidebar({ user }: { user: User }) {
               textDecoration: 'none',
               transition: 'background 0.15s, color 0.15s',
             }}>
-              <span dangerouslySetInnerHTML={{ __html: n.icon }} />
+              {/* Render icon as React component — no dangerouslySetInnerHTML */}
+              <n.Icon />
               {n.label}
             </Link>
           )
