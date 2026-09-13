@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import type { User } from 'firebase/auth'
 import { signOut } from '@/lib/auth'
-import { useEffect, useState } from 'react'
 
 // SVG icons as React components — replaces dangerouslySetInnerHTML (XSS fix)
 function IconDashboard() {
@@ -52,14 +51,9 @@ const NAV = [
   { href: '/settings',  label: 'Settings',  Icon: IconSettings  },
 ]
 
-export default function Sidebar({ user }: { user: User }) {
+export default function Sidebar({ user, dark, onToggleDark }: { user: User; dark: boolean; onToggleDark: () => void }) {
   const pathname = usePathname()
   const router   = useRouter()
-  const [dark, setDark] = useState(true)
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
-  }, [dark])
 
   const handleSignOut = async () => {
     await signOut()
@@ -118,7 +112,7 @@ export default function Sidebar({ user }: { user: User }) {
       <div style={{ borderTop: '0.5px solid var(--border)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 4 }}>
         {/* Theme toggle */}
         <button
-          onClick={() => setDark(!dark)}
+          onClick={() => onToggleDark()}
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '7px 10px', borderRadius: 8,
