@@ -54,7 +54,7 @@ export default function DashboardPage() {
       )}
 
       {/* Two column */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, marginTop: 20 }}>
+      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, marginTop: 20 }}>
         <UpcomingPosts posts={posts} loading={loading} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Stats */}

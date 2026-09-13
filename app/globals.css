@@ -73,3 +73,62 @@ html, body {
 }
 
 .animate-fade-up { animation: fade-up 0.3s ease both; }
+
+/* ── Responsive utilities ────────────────────────────────────────────────── */
+
+/* Viewport meta is set in layout.tsx — these rules handle layout shifts */
+
+/* Hide sidebar on mobile, show bottom nav instead */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none !important;
+  }
+  .main-content {
+    padding-bottom: 72px !important;
+  }
+  .bottom-nav {
+    display: flex !important;
+  }
+  /* Stack dashboard grid on mobile */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Full width stats on mobile */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* Bottom navigation bar — hidden on desktop */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--surface);
+  border-top: 0.5px solid var(--border);
+  align-items: center;
+  justify-content: space-around;
+  z-index: 50;
+  padding: 0 8px;
+}
+
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+  color: var(--text-2);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: color 0.15s;
+}
+
+.bottom-nav a.active {
+  color: var(--text-1);
+}

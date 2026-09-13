@@ -12,8 +12,13 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: 'ContentFlow',
   description: 'Stay consistent. Post better.',
-  // Prevent indexing during MVP — remove when ready to launch
   robots: { index: false, follow: false },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
