@@ -10,6 +10,8 @@ export interface Post {
   title: string
   caption: string
   hashtags: string
+  mediaUrl?: string        // Firebase Storage download URL
+  mediaType?: 'image' | 'video'
   scheduledAt: Timestamp
   status: PostStatus
   createdAt: Timestamp

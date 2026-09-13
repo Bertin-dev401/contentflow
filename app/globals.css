@@ -76,9 +76,11 @@ html, body {
 
 /* ── Responsive utilities ────────────────────────────────────────────────── */
 
-/* Viewport meta is set in layout.tsx — these rules handle layout shifts */
+/* Desktop: sidebar visible, bottom nav hidden */
+.sidebar { display: flex; }
+.bottom-nav { display: none; }
 
-/* Hide sidebar on mobile, show bottom nav instead */
+/* Mobile: hide sidebar, show bottom nav */
 @media (max-width: 768px) {
   .sidebar {
     display: none !important;
@@ -89,19 +91,16 @@ html, body {
   .bottom-nav {
     display: flex !important;
   }
-  /* Stack dashboard grid on mobile */
   .dashboard-grid {
     grid-template-columns: 1fr !important;
   }
-  /* Full width stats on mobile */
-  .stats-grid {
-    grid-template-columns: 1fr 1fr !important;
+  .dashboard-page {
+    padding: 20px 16px 96px !important;
   }
 }
 
-/* Bottom navigation bar — hidden on desktop */
+/* Bottom navigation bar */
 .bottom-nav {
-  display: none;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -124,7 +123,7 @@ html, body {
   color: var(--text-2);
   font-size: 10px;
   font-weight: 500;
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-radius: 8px;
   transition: color 0.15s;
 }

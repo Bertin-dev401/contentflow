@@ -129,3 +129,45 @@ export async function ensureUserDoc(uid: string, email: string): Promise<void> {
 export async function updateFcmToken(uid: string, token: string): Promise<void> {
   await updateDoc(doc(db, 'users', uid), { fcmToken: token, notificationsEnabled: true })
 }
+
+// ─── GOALS ────────────────────────────────────────────────────────────────────
+
+// Returns Monday of the current week as "YYYY-MM-DD"
+function getWeekStart(): string {
+  const now = new Date()
+  const day = now.getDay()
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1) // adjust for Sunday
+  const monday = new Date(now.setDate(diff))
+  return monday.toISOString().split('T')[0]
+}
+
+export async function getWeekGoals(userId: string): Promise<import('@/types/goal').Goal[]> {
+  const weekStart = getWeekStart()
+  const q = query(
+    collection(db, 'goals'),
+    where('userId', '==', userId),
+    where('weekStart', '==', weekStart),
+    orderBy('createdAt', 'asc')
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map(d => ({ goalId: d.id, ...d.data() } as import('@/types/goal').Goal))
+}
+
+export async function addGoal(userId: string, text: string): Promise<string> {
+  const ref = await addDoc(collection(db, 'goals'), {
+    userId,
+    text,
+    completed: false,
+    weekStart: getWeekStart(),
+    createdAt: serverTimestamp(),
+  })
+  return ref.id
+}
+
+export async function toggleGoal(goalId: string, completed: boolean): Promise<void> {
+  await updateDoc(doc(db, 'goals', goalId), { completed })
+}
+
+export async function deleteGoal(goalId: string): Promise<void> {
+  await deleteDoc(doc(db, 'goals', goalId))
+}
